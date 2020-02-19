@@ -1,0 +1,77 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 10vmin;
+  pointer-events: none;
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: white;
+}
+
+button {
+  background-color: #54cdcd;
+  color: #fff;
+  cursor: pointer;
+  font-size: 2.04rem;
+  font-weight: 300;
+  letter-spacing: 3px;
+  line-height: 1.4;
+  margin: 0;
+  padding: 1.4rem 2.8rem;
+  text-transform: uppercase;
+}
+button[disabled] {
+  cursor: default;
+}
+
+.people-list {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+}
+.people-list li {
+  height: 150px;
+  position: relative;
+  width: 150px;
+}
+.people-list.-mini li {
+  height: 75px;
+  width: 75px;
+}
+.people-list img {
+  object-fit: cover;
+  position: absoulte;
+  height: 100%;
+  width: 100%;
+}
+.people-list p {
+  background-color: rgba(50, 50, 250, 0.5);
+  bottom: 10px;
+  box-sizing: border-box;
+  color: white;
+  display: block;
+  height: 100%;
+  left: 0;
+  margin: 0;
+  padding: 10px;
+  opacity: 0;
+  position: absolute;
+  text-align: center;
+  text-decoration: none;
+  transition: 0.2s all ease;
+  width: 100%;
+}
+.people-list [data-clicked="true"] p {
+  background-color: rgba(50, 50, 250, 0.75);
+  opacity: 1;
+}
