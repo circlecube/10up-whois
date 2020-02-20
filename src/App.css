@@ -22,12 +22,12 @@ button {
   background-color: #54cdcd;
   color: #fff;
   cursor: pointer;
-  font-size: 2.04rem;
+  font-size: 2rem;
   font-weight: 300;
   letter-spacing: 3px;
   line-height: 1.4;
   margin: 0;
-  padding: 1.4rem 2.8rem;
+  padding: 0.75rem 2rem;
   text-transform: uppercase;
 }
 button[disabled] {
@@ -39,31 +39,28 @@ button[disabled] {
   display: flex;
   flex-wrap: wrap;
 }
-.people-list li {
+.person-card {
   height: 150px;
   position: relative;
   width: 150px;
+  overflow: hidden;
 }
-.people-list.-mini li {
-  height: 75px;
-  width: 75px;
-}
-.people-list img {
+.person-card img {
   object-fit: cover;
   position: absoulte;
   height: 100%;
   width: 100%;
 }
-.people-list p {
-  background-color: rgba(50, 50, 250, 0.5);
-  bottom: 10px;
+.person-card .detail {
+  background-color: #bd3a43;
+  bottom: -100%;
   box-sizing: border-box;
   color: white;
   display: block;
-  height: 100%;
+  height: auto;
   left: 0;
   margin: 0;
-  padding: 10px;
+  padding: 10px 8px;
   opacity: 0;
   position: absolute;
   text-align: center;
@@ -71,7 +68,28 @@ button[disabled] {
   transition: 0.2s all ease;
   width: 100%;
 }
-.people-list [data-clicked="true"] p {
-  background-color: rgba(50, 50, 250, 0.75);
-  opacity: 1;
+.person-card[data-correct="true"] .detail {
+  background-color: #54cdcd;
+}
+.people-list [data-clicked="true"] .detail {
+  opacity: 0.75;
+  bottom: 0;
+}
+.detail span {
+  display: block;
+}
+.person-name {
+  text-transform: uppercase;
+}
+
+.-mini .person-card {
+  height: 50px;
+  width: 50px;
+}
+.-mini .detail {
+  font-size: 8px;
+  padding: 6px 2px;
+}
+.detail .person-title {
+  display: none;
 }

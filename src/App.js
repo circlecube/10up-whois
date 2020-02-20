@@ -2,7 +2,7 @@ import React from 'react';
 
 import Quiz from './components/Quiz';
 import PersonCard from './components/PersonCard';
-import API from './utils/API';
+import scrapeTeam from './utils/API';
 import logo from './10up-logo.svg';
 import './App.css';
 
@@ -17,6 +17,10 @@ export default class App extends React.Component {
 		this.setState({ 
 			isQuiz: true,
 		});
+	}
+
+	handleCardClick = (correct) => {
+		return correct;
 	}
 
 	render() {
@@ -34,7 +38,11 @@ export default class App extends React.Component {
 							{
 								this.state.data.map( post => {
 									return (
-										<PersonCard post={ post } key={ post.slug } />
+										<PersonCard 
+											post={ post }
+											key={ post.id }
+											clickCallback={ this.handleCardClick }
+										/>
 									)
 								})
 							}
@@ -59,19 +67,11 @@ export default class App extends React.Component {
 
 	async componentDidMount() {
 		// load async data
-		let request = await API.get('/president', {
-			//per_page=50&order=asc&orderby=meta_value_num&meta_key=took_office
-			params: {
-				per_page: 50,
-				order: 'asc',
-				orderby: 'meta_value_num',
-				meta_key: 'took_office',
-			}
-		});
-		// update state with new da
+		let team = await scrapeTeam();
+		// update state with new data
 		// console.log(request.data);
 		this.setState({
-			data: request.data,
+			data: team,
 			isLoading: false,
 		});
 		// rerender app

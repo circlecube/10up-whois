@@ -5,27 +5,36 @@ export default class extends Component {
 		clicked: false,
 	};
 
-	clickPresident = () => {
+	clickPerson = () => {
 
 		this.setState({
 			clicked: true,
 		});
 
-		this.props.clickCallback( this.props.correct );
+		setTimeout(
+			function() { 
+				this.props.clickCallback( this.props.correct ); 
+			}.bind(this), 
+			500
+		);
+		
 	}
 
 	render () {
 		return (
 			<li
-				onClick={ this.clickPresident }
+				className="person-card"
+				onClick={ this.clickPerson }
 				data-clicked={ this.state.clicked }
+				data-correct={ this.props.correct }
 			>
 				<img 
-					src={ this.props.post.acf.portrait[0].sizes.thumbnail } 
-					alt={ this.props.post.title.rendered } 
+					src={ this.props.post.image } 
+					alt={ this.props.post.name } 
 				/>
-				<p>
-					{ this.props.post.title.rendered }
+				<p className="detail">
+					<span className="person-name">{ this.props.post.name }</span>
+					<span className="person-title">{ this.props.post.title }</span>
 				</p>
 			</li>
 		)

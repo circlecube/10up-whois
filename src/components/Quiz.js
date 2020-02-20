@@ -25,7 +25,7 @@ export default class extends Component {
 
 	makeQuizQuestion = () => {
 		this.setState((state, props) => ({
-			questionAnswers: this.randomPresidents(props.posts),
+			questionAnswers: this.randomPeople(props.posts),
 			questionAnswer: this.randomNumbers(4, 1),
 		}));
 	}
@@ -42,11 +42,11 @@ export default class extends Component {
 		}
 	}
 
-	randomPresidents = (posts) => {
+	randomPeople = (posts) => {
 		if ( posts ) {
 			const randomFour = [];
-			const numPresidents = posts.length;
-			const randomIndexes = this.randomNumbers(numPresidents, 4);
+			const numPeople = posts.length;
+			const randomIndexes = this.randomNumbers(numPeople, 4);
 			randomFour.push(posts[randomIndexes[0]]);
 			randomFour.push(posts[randomIndexes[1]]);
 			randomFour.push(posts[randomIndexes[2]]);
@@ -60,7 +60,7 @@ export default class extends Component {
 			<>
 				<p>
 					{ this.state.questionAnswers && this.state.questionAnswer && 
-		`Who is ${this.state.questionAnswers[this.state.questionAnswer[0]].title.rendered}?`	
+		`Who is ${ this.state.questionAnswers[this.state.questionAnswer[0]].name }?`	
 					}
 				</p>
 				<ul className="people-list">
@@ -69,9 +69,9 @@ export default class extends Component {
 						return (
 							<PersonCard 
 								post={ post }
+								key={ post.id }
 								index={ i }
 								correct={ i === this.state.questionAnswer[0] }
-								key={ post.slug }
 								clickCallback={ this.handleCardClick }
 							/>
 						)
