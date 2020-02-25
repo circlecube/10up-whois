@@ -40,12 +40,17 @@ button[disabled] {
   flex-wrap: wrap;
   justify-content: center;
   padding: 0 2rem;
+}
+.people-list.-mini {
   max-width: 1200px;
 }
+.people-list.-quiz {
+  max-width: 600px;
+}
 .person-card {
-  height: 150px;
   position: relative;
-  width: 150px;
+  height: 300px;
+  width: 300px;
   overflow: hidden;
 }
 .person-card img {
@@ -84,6 +89,9 @@ button[disabled] {
 .person-name {
   text-transform: uppercase;
 }
+.-quiz .person-name {
+  font-weight: bold;
+}
 
 .-mini .person-card {
   height: 50px;
@@ -93,6 +101,35 @@ button[disabled] {
   font-size: 8px;
   padding: 6px 2px;
 }
-.detail .person-title {
+.-mini .detail .person-title {
   display: none;
+}
+
+.score {
+  display: flex;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+}
+.score .record {
+  background: #54cdcd;
+  min-height: 1rem;
+  flex-grow: 1;
+  /* border-right: 1px solid #fff; */
+  transition: 0.2s all ease;
+}
+.score .record[data-correct="false"] {
+  background: #bd3a43;
+}
+.score .label {
+  position: absolute;
+  padding: 0 1rem;
+  font-size: 12px;
+  font-weight: bold;
+}
+.score .label.average {
+  right: 0;
+}
+.score .label.total {
+  left: 0;
 }

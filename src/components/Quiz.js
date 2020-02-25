@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
 import PersonCard from './PersonCard';
+import Score from './Score';
 
-export default class extends Component {
+export default class Quiz extends Component {
 	state = {
 		questionID: 0, // current correct answer - post index
 		questionAnswers: [], // current questions answers
@@ -11,6 +12,7 @@ export default class extends Component {
 			correct: 0, // number correct
 			total: 0 // out of total clicks
 		},
+		record: [], // keep track of every click - a boolean indicating the click was correct or incorrect.
 
 	};
 
@@ -98,7 +100,8 @@ export default class extends Component {
 			score: {
 				correct: state.score.correct + correct, // increment correct - if correct
 				total: state.score.total + 1, // increment total for every click
-			}
+			},
+			record: state.record.concat( correct ),
 		}));
 		if ( correct ) {
 			this.setState((state) => ({
@@ -116,7 +119,7 @@ export default class extends Component {
 		`Who is ${ this.props.posts[this.state.questionID].name }?`	
 					}
 				</p>
-				<ul className="people-list">
+				<ul className="people-list -quiz">
 				{
 					this.state.questionAnswers.map( (post, i) => {
 						return (
@@ -134,15 +137,11 @@ export default class extends Component {
 
 				<button onClick={this.makeQuizQuestion}>Skip</button>
 				
-				<p className="score">
-					{ this.state.score.total &&
-						`${ this.state.score.correct }
-						of
-						${ this.state.score.total }
-						:
-						${ this.state.score.correct / this.state.score.total * 100 }%`
-					}
-				</p>
+				<Score
+					record={this.state.record}
+					total={this.state.score.total}
+					correct={this.state.score.correct}
+				/>
 
 			</>
 		)
