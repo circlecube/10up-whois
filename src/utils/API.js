@@ -9,8 +9,10 @@ export default async function scrapeTeam() {
 	$('#team .team-member').each((i, elem) => {
 		team.push({
 		  image: $(elem).find('.avatar.photo').attr('data-src'),
-		  name: $(elem).find('.meta h3').text(),
+		  name: $(elem).find('.meta h3').text().replace(/\u00a0/g, " "),
 		  title: $(elem).find('.meta p').text(),
+		  group: $(elem).attr('class').replace('team-member team-', ''),
+		  bio: $(elem).find('.employee-bio > p').text(),
 		  id: i,
 		})
 	});
