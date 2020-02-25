@@ -6,10 +6,23 @@ import scrapeTeam from './utils/API';
 import logo from './10up-logo.svg';
 import './App.css';
 
+/**
+ * TODO
+ * 
+ * Make score as component with visual track
+ * Make quiz layout 2x2
+ * Extract groups and have a quiz per group - different button per group?
+ * Add timer for quiz duration
+ * Add high scores?
+ * 
+ * TOFIX
+ * Bug when person repeats on next question and clicked val persists
+ * 
+ */
 export default class App extends React.Component {
 	state = {
 		isLoading: true,
-		data: null,
+		team: null,
 		isQuiz: false,
 	};
 
@@ -18,6 +31,8 @@ export default class App extends React.Component {
 			isQuiz: true,
 		});
 	}
+
+
 
 	handleCardClick = (correct) => {
 		return correct;
@@ -31,12 +46,16 @@ export default class App extends React.Component {
 					
 					<img src={logo} className="App-logo" alt="logo" />
 
-					{ this.state.data && !this.state.isQuiz ? 	
+					{ this.state.isLoading && 
+						<p>Loading...</p>
+					}
+
+					{ this.state.team && !this.state.isQuiz && 	
 						<>
 							<p>Who are these people?</p>
 							<ul className="people-list -mini">
 							{
-								this.state.data.map( post => {
+								this.state.team.map( post => {
 									return (
 										<PersonCard 
 											post={ post }
@@ -51,13 +70,11 @@ export default class App extends React.Component {
 								Begin Quiz
 							</button>
 						</>
-						:
-						<p>Loading...</p>
 					}
 
 					{ this.state.isQuiz &&
 						<Quiz 
-							posts={this.state.data}
+							posts={this.state.team}
 						/>
 					}
 				</header>
@@ -71,7 +88,7 @@ export default class App extends React.Component {
 		// update state with new data
 		// console.log(request.data);
 		this.setState({
-			data: team,
+			team: team,
 			isLoading: false,
 		});
 		// rerender app
