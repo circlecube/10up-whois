@@ -3,17 +3,37 @@ import PersonCard from './PersonCard';
 
 export default class extends Component {
 	state = {
-		questionAnswers: [],
+		questionID: 0, // current correct answer - post index
+		questionAnswers: [], // current questions answers
+		correctlyAnswered: [], // track correct answers
+		quizLimit: 10, // number of questions
 		score: {
-			correct: 0,
-			total: 0
+			correct: 0, // number correct
+			total: 0 // out of total clicks
 		},
+
 	};
 
 	componentDidMount() {
 		this.makeQuizQuestion();
 	}
 
+	makeQuizQuestion = () => {
+		const randomAnswer = this.getUnansweredPerson( this.props.posts );
+		const randomAnswerChoices = this.randomPeople( this.props.posts, randomAnswer);
+
+		this.setState(() => ({
+			questionID: randomAnswer,
+			questionAnswers: randomAnswerChoices,
+		}));
+		// console.log( this.state );
+	}
+
+	/**
+	 * Get multiple random numbers
+	 * max = highest possible number: (0 - max)
+	 * length = number of random numbers - returned as array
+	 */
 	randomNumbers = (max, length) => {
 		var arr = [];
 		while(arr.length < length){
@@ -23,35 +43,68 @@ export default class extends Component {
 		return arr;
 	}
 
-	makeQuizQuestion = () => {
-		this.setState((state, props) => ({
-			questionAnswers: this.randomPeople(props.posts),
-			questionAnswer: this.randomNumbers(4, 1),
-		}));
-	}
-
-	handleCardClick = (correct) => {
-		this.setState((state, props) => ({
-			score: {
-				correct: state.score.correct + correct,
-				total: state.score.total + 1,
-			}
-		}));
-		if ( correct ) {
-			this.makeQuizQuestion();
+	/**
+	 * Get a new person for a quiz question
+	 */
+	getUnansweredPerson = (people) => {
+		let randomIndex = Math.floor(Math.random() * people.length);
+		// check if randomIndex is already included in the correctlyAnswered array
+		if ( !this.state.correctlyAnswered.includes(randomIndex) ){
+			// unique found, return it
+			// console.log( 'unique random found: ', randomIndex, this.state.correctlyAnswered);
+			return randomIndex;
+		} else {
+			// found duplicate, go again
+			return this.getUnansweredPerson(people);
 		}
 	}
 
-	randomPeople = (posts) => {
+	randomPeople = (posts, correctAnswer) => {
 		if ( posts ) {
-			const randomFour = [];
-			const numPeople = posts.length;
-			const randomIndexes = this.randomNumbers(numPeople, 4);
-			randomFour.push(posts[randomIndexes[0]]);
-			randomFour.push(posts[randomIndexes[1]]);
-			randomFour.push(posts[randomIndexes[2]]);
-			randomFour.push(posts[randomIndexes[3]]);
-			return randomFour;
+			const randomPeople = [];
+			const randomIndexes = this.randomNumbers(posts.length, 3);
+			// three random people
+			randomPeople.push(posts[randomIndexes[0]]);
+			randomPeople.push(posts[randomIndexes[1]]);
+			randomPeople.push(posts[randomIndexes[2]]);
+			// one preselected person
+			randomPeople.push(posts[correctAnswer]);
+			// retunr the shuffles answers
+			return this.shuffle(randomPeople);
+		}
+	}
+
+	shuffle = (array) => {
+		let currentIndex = array.length;
+		let temporaryValue, randomIndex;
+	  
+		// While there remain elements to shuffle...
+		while (0 !== currentIndex) {
+	  
+		  // Pick a remaining element...
+		  randomIndex = Math.floor(Math.random() * currentIndex);
+		  currentIndex -= 1;
+	  
+		  // And swap it with the current element.
+		  temporaryValue = array[currentIndex];
+		  array[currentIndex] = array[randomIndex];
+		  array[randomIndex] = temporaryValue;
+		}  
+		return array;
+	}
+
+	handleCardClick = (correct) => {
+		this.setState((state) => ({
+			score: {
+				correct: state.score.correct + correct, // increment correct - if correct
+				total: state.score.total + 1, // increment total for every click
+			}
+		}));
+		if ( correct ) {
+			this.setState((state) => ({
+				correctlyAnswered: state.correctlyAnswered.concat( state.questionID ),
+			}));
+			this.makeQuizQuestion();
 		}
 	}
 
@@ -59,8 +112,8 @@ export default class extends Component {
 		return (
 			<>
 				<p>
-					{ this.state.questionAnswers && this.state.questionAnswer && 
-		`Who is ${ this.state.questionAnswers[this.state.questionAnswer[0]].name }?`	
+					{ this.state.questionAnswers && this.state.questionID && 
+		`Who is ${ this.props.posts[this.state.questionID].name }?`	
 					}
 				</p>
 				<ul className="people-list">
@@ -71,7 +124,7 @@ export default class extends Component {
 								post={ post }
 								key={ post.id }
 								index={ i }
-								correct={ i === this.state.questionAnswer[0] }
+								correct={ post.id === this.state.questionID }
 								clickCallback={ this.handleCardClick }
 							/>
 						)
