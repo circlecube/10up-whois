@@ -32,20 +32,6 @@ export default class Quiz extends Component {
 	}
 
 	/**
-	 * Get multiple random numbers
-	 * max = highest possible number: (0 - max)
-	 * length = number of random numbers - returned as array
-	 */
-	randomNumbers = (max, length) => {
-		var arr = [];
-		while(arr.length < length){
-			var r = Math.floor(Math.random() * max);
-			if(arr.indexOf(r) === -1) arr.push(r);
-		}
-		return arr;
-	}
-
-	/**
 	 * Get a new person for a quiz question
 	 */
 	getUnansweredPerson = (people) => {
@@ -56,21 +42,42 @@ export default class Quiz extends Component {
 			// console.log( 'unique random found: ', randomIndex, this.state.correctlyAnswered);
 			return randomIndex;
 		} else {
-			// found duplicate, go again
+			// found duplicate, go again - recursively
 			return this.getUnansweredPerson(people);
 		}
 	}
 
+	/**
+	 * Get multiple random numbers
+	 * max = highest possible number: (0 - max)
+	 * length = number of random numbers - returned as array
+	 * arr = initial array
+	 */
+	randomUniqueNumbers = (max, length, arr = []) => {
+		const initlength = arr.length;
+		length += initlength;
+		while(arr.length < length){
+			var r = Math.floor(Math.random() * max);
+			// ensure value is unique
+			while ( arr.includes(r) ) {
+				r = Math.floor(Math.random() * max);
+			}
+			if(arr.indexOf(r) === -1) arr.push(r);
+		}
+		return arr;
+	}
+
 	randomPeople = (posts, correctAnswer) => {
 		if ( posts ) {
-			const randomPeople = [];
-			const randomIndexes = this.randomNumbers(posts.length, 3);
+			let randomIndexes = [correctAnswer];
+			let randomPeople = [];
+			randomIndexes = this.randomUniqueNumbers(posts.length, 3, randomIndexes);
+			console.log(randomIndexes);
 			// three random people
 			randomPeople.push(posts[randomIndexes[0]]);
 			randomPeople.push(posts[randomIndexes[1]]);
 			randomPeople.push(posts[randomIndexes[2]]);
-			// one preselected person
-			randomPeople.push(posts[correctAnswer]);
+			randomPeople.push(posts[randomIndexes[3]]);
 			// retunr the shuffles answers
 			return this.shuffle(randomPeople);
 		}
@@ -135,7 +142,7 @@ export default class Quiz extends Component {
 				}
 				</ul>
 
-				<button onClick={this.makeQuizQuestion}>Skip</button>
+				{/* <button onClick={this.makeQuizQuestion}>Skip</button> */}
 				
 				<Score
 					record={this.state.record}
