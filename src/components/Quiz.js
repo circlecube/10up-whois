@@ -72,7 +72,6 @@ export default class Quiz extends Component {
 			let randomIndexes = [correctAnswer];
 			let randomPeople = [];
 			randomIndexes = this.randomUniqueNumbers(posts.length, 3, randomIndexes);
-			console.log(randomIndexes);
 			// three random people
 			randomPeople.push(posts[randomIndexes[0]]);
 			randomPeople.push(posts[randomIndexes[1]]);
@@ -143,7 +142,7 @@ export default class Quiz extends Component {
 				</ul>
 
 				{/* <button onClick={this.makeQuizQuestion}>Skip</button> */}
-				
+
 				<Score
 					record={this.state.record}
 					total={this.state.score.total}

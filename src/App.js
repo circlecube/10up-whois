@@ -8,9 +8,6 @@ import './App.css';
 
 /**
  * TODO
- * 
- * Make score as component with visual track
- * Make quiz layout 2x2
  * Extract groups and have a quiz per group - different button per group?
  * Add timer for quiz duration
  * Add high scores?
