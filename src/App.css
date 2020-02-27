@@ -133,3 +133,8 @@ button[disabled] {
 .score .label.total {
   left: 0;
 }
+
+select {
+  text-transform: capitalize;
+  margin: 1rem;
+}

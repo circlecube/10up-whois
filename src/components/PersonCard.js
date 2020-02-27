@@ -29,12 +29,12 @@ export default class PersonCard extends Component {
 				data-correct={ this.props.correct }
 			>
 				<img 
-					src={ this.props.post.image } 
-					alt={ this.props.post.name } 
+					src={ this.props.person.image } 
+					alt={ this.props.person.name } 
 				/>
 				<p className="detail">
-					<span className="person-name">{ this.props.post.name }</span>
-					<span className="person-title">{ this.props.post.title }</span>
+					<span className="person-name">{ this.props.person.name }</span>
+					<span className="person-title">{ this.props.person.title }</span>
 				</p>
 			</li>
 		)

@@ -4,13 +4,15 @@ import Score from './Score';
 
 export default class Quiz extends Component {
 	state = {
-		questionID: 0, // current correct answer - post index
+		questionID: 0, // current correct answer - post id
+		questionIndex: 0, // current correct answer - post array index
 		questionAnswers: [], // current questions answers
 		correctlyAnswered: [], // track correct answers
 		quizLimit: 10, // number of questions
 		score: {
 			correct: 0, // number correct
-			total: 0 // out of total clicks
+			total: 0, // out of total clicks
+			average: 0, // average score
 		},
 		record: [], // keep track of every click - a boolean indicating the click was correct or incorrect.
 
@@ -21,11 +23,19 @@ export default class Quiz extends Component {
 	}
 
 	makeQuizQuestion = () => {
-		const randomAnswer = this.getUnansweredPerson( this.props.posts );
-		const randomAnswerChoices = this.randomPeople( this.props.posts, randomAnswer);
+		// check if there are any unanswered left - if not signal quiz end 
+		if ( this.state.correctlyAnswered.length >= this.props.team.length ) {
+			this.props.endCallback( this.state.score );
+			return;
+		}
+
+		const randomAnswerIndex = this.getUnansweredPerson( this.props.team );
+		const randomAnswerID = this.props.team[randomAnswerIndex].id;
+		const randomAnswerChoices = this.randomPeople( this.props.team, randomAnswerIndex);
 
 		this.setState(() => ({
-			questionID: randomAnswer,
+			questionID: randomAnswerID,
+			questionIndex: randomAnswerIndex,
 			questionAnswers: randomAnswerChoices,
 		}));
 		// console.log( this.state );
@@ -36,6 +46,7 @@ export default class Quiz extends Component {
 	 */
 	getUnansweredPerson = (people) => {
 		let randomIndex = Math.floor(Math.random() * people.length);
+
 		// check if randomIndex is already included in the correctlyAnswered array
 		if ( !this.state.correctlyAnswered.includes(randomIndex) ){
 			// unique found, return it
@@ -67,16 +78,16 @@ export default class Quiz extends Component {
 		return arr;
 	}
 
-	randomPeople = (posts, correctAnswer) => {
-		if ( posts ) {
+	randomPeople = (team, correctAnswer) => {
+		if ( team ) {
 			let randomIndexes = [correctAnswer];
 			let randomPeople = [];
-			randomIndexes = this.randomUniqueNumbers(posts.length, 3, randomIndexes);
+			randomIndexes = this.randomUniqueNumbers(team.length, 3, randomIndexes);
 			// three random people
-			randomPeople.push(posts[randomIndexes[0]]);
-			randomPeople.push(posts[randomIndexes[1]]);
-			randomPeople.push(posts[randomIndexes[2]]);
-			randomPeople.push(posts[randomIndexes[3]]);
+			randomPeople.push(team[randomIndexes[0]]);
+			randomPeople.push(team[randomIndexes[1]]);
+			randomPeople.push(team[randomIndexes[2]]);
+			randomPeople.push(team[randomIndexes[3]]);
 			// retunr the shuffles answers
 			return this.shuffle(randomPeople);
 		}
@@ -101,17 +112,28 @@ export default class Quiz extends Component {
 		return array;
 	}
 
+	calculateScore = (correct,total) => {
+		return Math.floor( correct / total * 100 );
+	}
+
 	handleCardClick = (correct) => {
+		 // increment correct - if correct
+		let scorecorrect = this.state.score.correct + correct;
+		// increment total for every click
+		let scoretotal = this.state.score.total + 1;
+		// calculate average
+		let scoreaverage = this.calculateScore(scorecorrect, scoretotal);
 		this.setState((state) => ({
 			score: {
-				correct: state.score.correct + correct, // increment correct - if correct
-				total: state.score.total + 1, // increment total for every click
+				correct: scorecorrect,
+				total: scoretotal, 
+				average: scoreaverage
 			},
 			record: state.record.concat( correct ),
 		}));
 		if ( correct ) {
 			this.setState((state) => ({
-				correctlyAnswered: state.correctlyAnswered.concat( state.questionID ),
+				correctlyAnswered: state.correctlyAnswered.concat( state.questionIndex ),
 			}));
 			this.makeQuizQuestion();
 		}
@@ -121,19 +143,19 @@ export default class Quiz extends Component {
 		return (
 			<>
 				<p>
-					{ this.state.questionAnswers && this.state.questionID && 
-		`Who is ${ this.props.posts[this.state.questionID].name }?`	
+					{ this.state.questionAnswers && 
+						`Who is ${ this.props.team[this.state.questionIndex].name }?`	
 					}
 				</p>
 				<ul className="people-list -quiz">
 				{
-					this.state.questionAnswers.map( (post, i) => {
+					this.state.questionAnswers.map( (person, i) => {
 						return (
 							<PersonCard 
-								post={ post }
-								key={ post.id }
+								person={ person }
+								key={ person.id }
 								index={ i }
-								correct={ post.id === this.state.questionID }
+								correct={ person.id === this.state.questionID }
 								clickCallback={ this.handleCardClick }
 							/>
 						)
@@ -143,11 +165,14 @@ export default class Quiz extends Component {
 
 				{/* <button onClick={this.makeQuizQuestion}>Skip</button> */}
 
-				<Score
-					record={this.state.record}
-					total={this.state.score.total}
-					correct={this.state.score.correct}
-				/>
+				{ this.state.record.length > 0 &&
+					<Score
+						record={this.state.record}
+						total={this.state.score.total}
+						correct={this.state.score.correct}
+						average={this.state.score.average}
+					/>
+				}
 
 			</>
 		)
