@@ -8,24 +8,46 @@ export default class Quiz extends Component {
 		questionIndex: 0, // current correct answer - post array index
 		questionAnswers: [], // current questions answers
 		correctlyAnswered: [], // track correct answers
-		quizLimit: 10, // number of questions
 		score: {
 			correct: 0, // number correct
 			total: 0, // out of total clicks
 			average: 0, // average score
 		},
 		record: [], // keep track of every click - a boolean indicating the click was correct or incorrect.
-
+		startTime: Date.now(), // time quiz starts
+		duration: 0, // quiz duration
+		teamName: '', // name of selected team - quiz subject
 	};
 
 	componentDidMount() {
+		this.startQuiz();
 		this.makeQuizQuestion();
 	}
+
+	startQuiz = () => {
+		this.setState({
+			startTime: Date.now(),
+			teamName: this.props.teamName,
+		});
+		console.log('starting quiz at', this.state.startTime);
+	}
+
+	endQuiz = () => {
+		this.setState({
+			duration: Date.now() - this.state.startTime,
+		});
+		let quiz = {
+			score: this.state.score,
+			teamName: this.state.teamName,
+			duration: this.state.duration,
+		};
+		this.props.endCallback( quiz );
+	} 
 
 	makeQuizQuestion = () => {
 		// check if there are any unanswered left - if not signal quiz end 
 		if ( this.state.correctlyAnswered.length >= this.props.team.length ) {
-			this.props.endCallback( this.state.score );
+			this.endQuiz();
 			return;
 		}
 

@@ -10,9 +10,8 @@ import './App.css';
  * TODO
  * Add options to quiz: 
  * 		subject: name, title, pod, 
- * 		team: exec, eng, design, 
- * Add timer for quiz duration
  * Add high scores?
+ * Add analytics events to card clicks
  * 
  * TOFIX
  * Bug when person repeats on next question and clicked val persists
@@ -26,6 +25,7 @@ export default class App extends React.Component {
 		selectedTeam: null,
 		isQuiz: false,
 		testing: true,
+		lastQuiz: null,
 	};
 
 	beginQuiz = () => {
@@ -34,14 +34,15 @@ export default class App extends React.Component {
 		});
 	}
 
-	endQuiz = (score) => {
+	endQuiz = (quiz) => {
 		this.setState({ 
 			isQuiz: false,
+			lastQuiz: quiz,
 		});
 
 		const message = `
 Congratulations! You finished the quiz!
-You scored ${score.average}% (${score.correct} of ${score.total})!
+You scored ${quiz.score.average}% (${quiz.score.correct} of ${quiz.score.total}) in ${quiz.duration/1000}s!
 
 Try again or try a different quiz!
 `
@@ -155,11 +156,17 @@ Try again or try a different quiz!
 							<button onClick={this.beginQuiz}>
 								Begin Quiz
 							</button>
+								{ this.state.lastQuiz && 
+									<p>
+										Previous quiz: {this.state.lastQuiz.teamName} - {this.state.lastQuiz.score.average}% in {Math.round(this.state.lastQuiz.duration/1000)}s
+									</p>
+								}
 						</>
 					}
 
 					{ this.state.isQuiz &&
 						<Quiz 
+							teamName={this.state.selectedTeam.title}
 							team={this.state.selectedTeam.team}
 							endCallback={this.endQuiz}
 						/>
