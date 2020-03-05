@@ -33,13 +33,17 @@ export default class Quiz extends Component {
 	}
 
 	endQuiz = () => {
+		let now = Date.now();
 		this.setState({
-			duration: Date.now() - this.state.startTime,
+			duration: now - this.state.startTime,
 		});
 		let quiz = {
 			score: this.state.score,
 			teamName: this.state.teamName,
 			duration: this.state.duration,
+			timestamp: now,
+			name: 'TEST',
+			avatar: 'TEST',
 		};
 		this.props.endCallback( quiz );
 	} 

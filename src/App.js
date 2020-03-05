@@ -3,6 +3,7 @@ import React from 'react';
 import Quiz from './components/Quiz';
 import PersonCard from './components/PersonCard';
 import scrapeTeam from './utils/API';
+import firebase from './utils/firebase';
 import logo from './10up-logo.svg';
 import './App.css';
 
@@ -23,9 +24,12 @@ export default class App extends React.Component {
 		team: null,
 		groups: [],
 		selectedTeam: null,
+		selectedName: null,
+		selectedAvatar: null,
 		isQuiz: false,
 		testing: true,
 		lastQuiz: null,
+		leaderboard: [],
 	};
 
 	beginQuiz = () => {
@@ -39,6 +43,7 @@ export default class App extends React.Component {
 			isQuiz: false,
 			lastQuiz: quiz,
 		});
+		this.addToLeaderboard(quiz);
 
 		const message = `
 Congratulations! You finished the quiz!
@@ -67,6 +72,7 @@ Try again or try a different quiz!
 		});
 		groups.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0)); 
 
+		// Create test group *van
 		if( this.state.testing) {
 		groups.push({
 			title: "Test *van",
@@ -104,11 +110,30 @@ Try again or try a different quiz!
 		this.setState({
 			team: team,
 		});
+
+		this.loadLeaderboard();
 		
-		// rerender app
+		// render app
 		this.setState({
 			isLoading: false,
 		});
+	}
+
+	loadLeaderboard = () => {
+		// load leaderboard from firebase
+		const fbLeaderboardRef = firebase.database().ref('leaderboard');
+		fbLeaderboardRef.on('value', (snapshot) =>{
+			let leaderboard = snapshot.val();
+			this.setState({
+				leaderboard: leaderboard,
+			});
+		});
+	}
+
+	addToLeaderboard = (quizrecord) => {
+		// load leaderboard from firebase
+		const fbLeaderboardRef = firebase.database().ref('leaderboard');
+		fbLeaderboardRef.push(quizrecord);
 	}
 
 	render() {
