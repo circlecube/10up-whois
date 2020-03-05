@@ -11,8 +11,14 @@ import './App.css';
  * TODO
  * Add options to quiz: 
  * 		subject: name, title, pod, 
- * Add high scores?
- * Add analytics events to card clicks
+ * Update person card click handler to the quiz and app level
+ * 		Quiz level to determin if correct shold fix bug where clicked state is persistent to next question
+ * 		App level - set selected name and avatar for leaderboard
+ * Add high scores:
+ * 		display leaderboard on load (per team?)
+ * 		add good quiz record to leaderboard
+ * 		get new leaderboard after adding new record and re-render
+ * Add analytics events to card clicks?
  * 
  * TOFIX
  * Bug when person repeats on next question and clicked val persists
@@ -43,7 +49,12 @@ export default class App extends React.Component {
 			isQuiz: false,
 			lastQuiz: quiz,
 		});
-		this.addToLeaderboard(quiz);
+
+		// if score is high enough
+		if ( quiz.score.average === 100 ) {
+			// save to leaderboard
+			this.addToLeaderboard(quiz);
+		}
 
 		const message = `
 Congratulations! You finished the quiz!
@@ -121,7 +132,7 @@ Try again or try a different quiz!
 
 	loadLeaderboard = () => {
 		// load leaderboard from firebase
-		const fbLeaderboardRef = firebase.database().ref('leaderboard');
+		const fbLeaderboardRef = firebase.database().ref('leaderboard').orderByChild('duration');
 		fbLeaderboardRef.on('value', (snapshot) =>{
 			let leaderboard = snapshot.val();
 			this.setState({
