@@ -2,6 +2,7 @@ import React from 'react';
 
 import Quiz from './components/Quiz';
 import PersonCard from './components/PersonCard';
+import Leaderboard from './components/Leaderboard';
 import scrapeTeam from './utils/API';
 import firebase from './utils/firebase';
 import logo from './10up-logo.svg';
@@ -15,9 +16,8 @@ import './App.css';
  * 		Quiz level to determin if correct shold fix bug where clicked state is persistent to next question
  * 		App level - set selected name and avatar for leaderboard
  * Add high scores:
- * 		display leaderboard on load (per team?)
- * 		add good quiz record to leaderboard
  * 		get new leaderboard after adding new record and re-render
+ * 		set up google account authentication - 10up accounts only?
  * Add analytics events to card clicks?
  * 
  * TOFIX
@@ -30,12 +30,13 @@ export default class App extends React.Component {
 		team: null,
 		groups: [],
 		selectedTeam: null,
-		selectedName: null,
-		selectedAvatar: null,
+		selectedName: 'TEST',
+		selectedAvatar: logo,
 		isQuiz: false,
 		testing: true,
 		lastQuiz: null,
 		leaderboard: [],
+		selectedLeaderboard: [],
 	};
 
 	beginQuiz = () => {
@@ -103,8 +104,13 @@ Try again or try a different quiz!
 	}
 
 	handleTeamChange = (event) => {
+		let teamLeaderboard = [];
+		if ( this.state.leaderboard.length > 0 ) {
+			teamLeaderboard = this.state.leaderboard.filter((record) => record.teamName === event.target.value );
+		}
 		this.setState({ 
 			selectedTeam: this.state.groups.find(o => o.title === event.target.value ),
+			selectedLeaderboard: teamLeaderboard,
 		});
 	}
 
@@ -135,8 +141,18 @@ Try again or try a different quiz!
 		const fbLeaderboardRef = firebase.database().ref('leaderboard').orderByChild('duration');
 		fbLeaderboardRef.on('value', (snapshot) =>{
 			let leaderboard = snapshot.val();
+			let leaderboard_ar = [];
+			// convert to array
+			if ( !Array.isArray(leaderboard) ) {
+				leaderboard_ar = Object.keys(leaderboard).map(function(key, i) {
+					return leaderboard[key];
+				  });
+			} else {
+				leaderboard_ar = leaderboard;
+			}
+
 			this.setState({
-				leaderboard: leaderboard,
+				leaderboard: leaderboard_ar,
 			});
 		});
 	}
@@ -164,7 +180,7 @@ Try again or try a different quiz!
 							<p>Who are these people?</p>
 							<ul className="people-list -mini">
 							{
-								this.state.team.map( person => {
+								this.state.selectedTeam.team.map( person => {
 									return (
 										<PersonCard 
 											person={ person }
@@ -192,11 +208,15 @@ Try again or try a different quiz!
 							<button onClick={this.beginQuiz}>
 								Begin Quiz
 							</button>
-								{ this.state.lastQuiz && 
-									<p>
-										Previous quiz: {this.state.lastQuiz.teamName} - {this.state.lastQuiz.score.average}% in {Math.round(this.state.lastQuiz.duration/1000)}s
-									</p>
-								}
+							
+							{ this.state.leaderboard && this.state.leaderboard.length > 0 &&
+								<Leaderboard
+									title="High Scores"
+									records={this.state.selectedLeaderboard}
+									teamName={this.state.selectedTeam.title}
+								/>
+							}
+							
 						</>
 					}
 

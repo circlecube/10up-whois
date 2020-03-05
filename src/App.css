@@ -138,3 +138,13 @@ select {
   text-transform: capitalize;
   margin: 1rem;
 }
+
+.leaderboard {
+  width: 100%;
+  text-align: left;
+  margin: 3rem 0;
+  border: 1px solid #54cdcd;
+}
+.leaderboard-title {
+  text-align: center;
+}
