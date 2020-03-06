@@ -27,7 +27,7 @@ export default class Leaderboard extends React.Component {
 										<td><img src={r.avatar} width="50" height="50" alt={r.name} /></td>
 										<td>{r.name}</td>
 										<td>{r.score.average}</td>
-										<td>{r.duration}</td>
+										<td>{parseFloat(r.duration / 1000).toFixed(2)}s</td>
 									</tr>
 								)
 								} else {

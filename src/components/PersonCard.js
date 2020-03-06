@@ -1,31 +1,19 @@
 import React, { Component } from 'react'
 
 export default class PersonCard extends Component {
-	state = {
-		clicked: false,
-	};
 
-	clickPerson = () => {
-
-		this.setState({
-			clicked: true,
-		});
-
-		setTimeout(
-			function() { 
-				this.props.clickCallback( this.props.correct ); 
-			}.bind(this), 
-			500
-		);
-		
+	clickCard = () => {
+		if ( !this.props.clicked ) {
+			this.props.onClick( this.props.person, this.props.index, this.props.correct );
+		}
 	}
 
 	render () {
 		return (
 			<li
 				className="person-card"
-				onClick={ this.clickPerson }
-				data-clicked={ this.state.clicked }
+				onClick={ this.clickCard }
+				data-clicked={ this.props.clicked }
 				data-correct={ this.props.correct }
 			>
 				<img 

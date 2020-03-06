@@ -17,6 +17,7 @@ export default class Quiz extends Component {
 		startTime: Date.now(), // time quiz starts
 		duration: 0, // quiz duration
 		teamName: '', // name of selected team - quiz subject
+		clicked: [false, false, false, false], // array to store clicked state of 4 question answers
 	};
 
 	componentDidMount() {
@@ -54,6 +55,10 @@ export default class Quiz extends Component {
 			this.endQuiz();
 			return;
 		}
+		// reset clicked
+		this.setState({
+			clicked: [false, false, false, false],
+		});
 
 		const randomAnswerIndex = this.getUnansweredPerson( this.props.team );
 		const randomAnswerID = this.props.team[randomAnswerIndex].id;
@@ -142,13 +147,21 @@ export default class Quiz extends Component {
 		return Math.floor( correct / total * 100 );
 	}
 
-	handleCardClick = (correct) => {
+	handleCardClick = (person, i, correct) => {
+		// record click
+		let newClicked = [...this.state.clicked];
+		newClicked[i] = true;
+		this.setState({
+			clicked: newClicked,
+		});
+
 		 // increment correct - if correct
 		let scorecorrect = this.state.score.correct + correct;
 		// increment total for every click
 		let scoretotal = this.state.score.total + 1;
 		// calculate average
 		let scoreaverage = this.calculateScore(scorecorrect, scoretotal);
+
 		this.setState((state) => ({
 			score: {
 				correct: scorecorrect,
@@ -157,11 +170,18 @@ export default class Quiz extends Component {
 			},
 			record: state.record.concat( correct ),
 		}));
+
 		if ( correct ) {
 			this.setState((state) => ({
 				correctlyAnswered: state.correctlyAnswered.concat( state.questionIndex ),
 			}));
-			this.makeQuizQuestion();
+
+			setTimeout(
+				function() { 
+					this.makeQuizQuestion();
+				}.bind(this), 
+				500
+			);
 		}
 	}
 
@@ -182,7 +202,8 @@ export default class Quiz extends Component {
 								key={ person.id }
 								index={ i }
 								correct={ person.id === this.state.questionID }
-								clickCallback={ this.handleCardClick }
+								clicked={ this.state.clicked[i] }
+								onClick={ this.handleCardClick }
 							/>
 						)
 					})

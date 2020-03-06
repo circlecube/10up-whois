@@ -1,21 +1,22 @@
-.App {
+.app {
   text-align: center;
 }
 
-.App-logo {
+.logo {
+  cursor: pointer;
+  display: block;
   height: 10vmin;
-  pointer-events: none;
 }
 
-.App-header {
+.header {
+  align-items: center;
   background-color: #282c34;
-  min-height: 100vh;
+  color: white;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
   font-size: 16px;
-  color: white;
+  justify-content: center;
+  min-height: 100vh;
 }
 
 button {
@@ -35,10 +36,10 @@ button[disabled] {
 }
 
 .people-list {
-  list-style: none;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
+  list-style: none;
   padding: 0 2rem;
 }
 .people-list.-mini {
@@ -48,15 +49,16 @@ button[disabled] {
   max-width: 600px;
 }
 .person-card {
-  position: relative;
-  height: 300px;
-  width: 300px;
+  cursor: pointer;
+  height: 50%;
   overflow: hidden;
+  position: relative;
+  width: 50%;
 }
 .person-card img {
+  height: 100%;
   object-fit: cover;
   position: absoulte;
-  height: 100%;
   width: 100%;
 }
 .person-card .detail {
@@ -68,8 +70,8 @@ button[disabled] {
   height: auto;
   left: 0;
   margin: 0;
-  padding: 10px 8px;
   opacity: 0;
+  padding: 10px 8px;
   position: absolute;
   text-align: center;
   text-decoration: none;
@@ -80,8 +82,8 @@ button[disabled] {
   background-color: #54cdcd;
 }
 .people-list [data-clicked="true"] .detail {
-  opacity: 0.75;
   bottom: 0;
+  opacity: 0.75;
 }
 .detail span {
   display: block;
@@ -106,26 +108,25 @@ button[disabled] {
 }
 
 .score {
+  bottom: 0;
   display: flex;
   position: fixed;
-  bottom: 0;
   width: 100%;
 }
 .score .record {
   background: #54cdcd;
-  min-height: 1rem;
   flex-grow: 1;
-  /* border-right: 1px solid #fff; */
+  min-height: 1rem;
   transition: 0.2s all ease;
 }
 .score .record[data-correct="false"] {
   background: #bd3a43;
 }
 .score .label {
-  position: absolute;
-  padding: 0 1rem;
   font-size: 12px;
   font-weight: bold;
+  padding: 0 1rem;
+  position: absolute;
 }
 .score .label.average {
   right: 0;
@@ -135,15 +136,16 @@ button[disabled] {
 }
 
 select {
-  text-transform: capitalize;
   margin: 1rem;
+  padding: 0.5rem 1rem;
+  text-transform: capitalize;
 }
 
 .leaderboard {
-  width: 100%;
-  text-align: left;
-  margin: 3rem 0;
   border: 1px solid #54cdcd;
+  margin: 3rem 0;
+  text-align: left;
+  width: 100%;
 }
 .leaderboard-title {
   text-align: center;

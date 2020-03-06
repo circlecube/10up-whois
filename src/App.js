@@ -12,17 +12,10 @@ import './App.css';
  * TODO
  * Add options to quiz: 
  * 		subject: name, title, pod, 
- * Update person card click handler to the quiz and app level
- * 		Quiz level to determin if correct shold fix bug where clicked state is persistent to next question
- * 		App level - set selected name and avatar for leaderboard
  * Add high scores:
- * 		get new leaderboard after adding new record and re-render
- * 		set up google account authentication - 10up accounts only?
- * Add analytics events to card clicks?
+ * 		set up google account authentication - 10up accounts only for user selection
+ * Add analytics events to card clicks
  * 
- * TOFIX
- * Bug when person repeats on next question and clicked val persists
- * Bug you can click the same person multiple times and it affects your score
  */
 export default class App extends React.Component {
 	state = {
@@ -30,18 +23,28 @@ export default class App extends React.Component {
 		team: null,
 		groups: [],
 		selectedTeam: null,
-		selectedName: 'TEST',
+		selectedName: 'Anonymous',
 		selectedAvatar: logo,
 		isQuiz: false,
 		testing: true,
 		lastQuiz: null,
 		leaderboard: [],
 		selectedLeaderboard: [],
+		message: `
+<h2>Welcome!</h2>
+<p>Click yourself and then select a group for your quiz.</p>`,
 	};
 
 	beginQuiz = () => {
 		this.setState({ 
 			isQuiz: true,
+			message: null,
+		});
+	}
+
+	cancelQuiz = () => {
+		this.setState({
+			isQuiz: false,
 		});
 	}
 
@@ -54,17 +57,18 @@ export default class App extends React.Component {
 		// if score is high enough
 		if ( quiz.score.average === 100 ) {
 			// save to leaderboard
+			quiz.name = this.state.selectedName;
+			quiz.avatar = this.state.selectedAvatar;
 			this.addToLeaderboard(quiz);
 		}
 
-		const message = `
-Congratulations! You finished the quiz!
-You scored ${quiz.score.average}% (${quiz.score.correct} of ${quiz.score.total}) in ${quiz.duration/1000}s!
+		this.setState({
+			message: `
+<h2>Congratulations! You finished the quiz!</h2>
+<h3>You scored ${quiz.score.average}% (${quiz.score.correct} of ${quiz.score.total}) in ${parseFloat(quiz.duration / 1000).toFixed(2)}s!</h3>
+<p>Try again or try a different quiz! You must score 100% to be added to the leaderboard!</p>`,
+		});
 
-Try again or try a different quiz!
-`
-		alert(message);
-		
 	}
 
 	setGroups = (team) => {
@@ -98,18 +102,27 @@ Try again or try a different quiz!
 		});
 	}
 
-	handleCardClick = (correct) => {
-		// do nothing so cards have a click to display name
-		return correct;
+	handleCardClick = ( person, i, correct ) => {
+		// set selected name and avatar
+		this.setState({
+			selectedName: person.name,
+			selectedAvatar: person.image,
+		});
+		// unclick all other cards
+
 	}
 
 	handleTeamChange = (event) => {
+		this.setSelectedTeam(event.target.value)
+	}
+
+	setSelectedTeam = (teamName) => {
 		let teamLeaderboard = [];
 		if ( this.state.leaderboard.length > 0 ) {
-			teamLeaderboard = this.state.leaderboard.filter((record) => record.teamName === event.target.value );
+			teamLeaderboard = this.state.leaderboard.filter((record) => record.teamName === teamName );
 		}
 		this.setState({ 
-			selectedTeam: this.state.groups.find(o => o.title === event.target.value ),
+			selectedTeam: this.state.groups.find(o => o.title === teamName ),
 			selectedLeaderboard: teamLeaderboard,
 		});
 	}
@@ -136,9 +149,9 @@ Try again or try a different quiz!
 		});
 	}
 
-	loadLeaderboard = () => {
+	async loadLeaderboard() {
 		// load leaderboard from firebase
-		const fbLeaderboardRef = firebase.database().ref('leaderboard').orderByChild('duration');
+		const fbLeaderboardRef = await firebase.database().ref('leaderboard').orderByChild('duration');
 		fbLeaderboardRef.on('value', (snapshot) =>{
 			let leaderboard = snapshot.val();
 			let leaderboard_ar = [];
@@ -153,6 +166,8 @@ Try again or try a different quiz!
 
 			this.setState({
 				leaderboard: leaderboard_ar,
+			}, () => {
+				this.setSelectedTeam( this.state.selectedTeam.title);
 			});
 		});
 	}
@@ -161,15 +176,33 @@ Try again or try a different quiz!
 		// load leaderboard from firebase
 		const fbLeaderboardRef = firebase.database().ref('leaderboard');
 		fbLeaderboardRef.push(quizrecord);
+
+		var joined = this.state.leaderboard.concat(quizrecord);
+		
+		this.setState({
+			leaderboard: joined,
+		}, () => {
+			// refresh with latest scores
+			this.loadLeaderboard();
+		});
 	}
 
 	render() {
 	
 		return (
-			<div className="App">
-				<header className="App-header">
+			<div className="app">
+				<header className="header">
 					
-					<img src={logo} className="App-logo" alt="logo" />
+					<img 
+						src={logo} 
+						className="logo" 
+						alt="Who is 10up" 
+						onClick={ this.cancelQuiz }
+					/>
+
+					{ this.state.message &&
+						<div className="message" dangerouslySetInnerHTML={{__html: this.state.message}}></div>
+					}
 
 					{ this.state.isLoading && 
 						<p>Loading...</p>
@@ -185,7 +218,9 @@ Try again or try a different quiz!
 										<PersonCard 
 											person={ person }
 											key={ person.id }
-											clickCallback={ this.handleCardClick }
+											clicked={ person.name === this.state.selectedName }
+											correct={ true }
+											onClick={ this.handleCardClick }
 										/>
 									)
 								})
