@@ -9,7 +9,7 @@ export default class Leaderboard extends React.Component {
 					<table className="leaderboard">
 						<thead className="label">
 							<tr className="leaderboard-title">
-								<th colSpan="4">{ this.props.title } : { this.props.teamName }</th>
+								<th colSpan="4">{ this.props.title } for { this.props.teamName }</th>
 							</tr>
 							<tr>
 								<th></th>
