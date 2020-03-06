@@ -22,8 +22,28 @@
   top: 0;
   transition: background-color 0.2s ease;
 }
+
 .code-link:hover {
   background-color: #fff;
+}
+
+.current-user.person-card {
+  height: 80px;
+  left: 0;
+  margin: 1rem;
+  overflow: visible;
+  position: absolute;
+  top: 0;
+  width: 80px;
+}
+
+.current-user.person-card img {
+  object-fit: contain;
+}
+
+.current-user.person-card[data-clicked="true"] .detail {
+  top: 100%;
+  bottom: initial;
 }
 
 .header {
@@ -96,7 +116,7 @@ button[disabled] {
 .person-card[data-correct="true"] .detail {
   background-color: #54cdcd;
 }
-.people-list [data-clicked="true"] .detail {
+.person-card[data-clicked="true"] .detail {
   bottom: 0;
   opacity: 0.75;
 }
@@ -114,7 +134,8 @@ button[disabled] {
   height: 50px;
   width: 50px;
 }
-.-mini .detail {
+.-mini .detail,
+.current-user.person-card .detail {
   font-size: 8px;
   padding: 6px 2px;
 }
